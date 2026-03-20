@@ -24,14 +24,20 @@
 
   .input-area { background: var(--white); padding: 12px 14px 10px; border-bottom: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
   .input-row { display: flex; gap: 8px; align-items: center; }
+
   .product-input { flex: 1; border: 1.5px solid var(--border); border-radius: 24px; padding: 11px 16px; font-size: 15px; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s; }
   .product-input:focus { border-color: var(--green); background: white; }
+
+  .btn-mic { width: 44px; height: 44px; border-radius: 50%; background: var(--bg); border: 1.5px solid var(--border); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .btn-mic.recording { background: var(--red); border-color: var(--red); animation: pulse 0.8s infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+
   .btn-add { width: 44px; height: 44px; border-radius: 50%; background: var(--green); border: none; color: white; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.1s; }
   .btn-add:active { transform: scale(0.92); }
 
-  .mic-tip { display: flex; align-items: center; gap: 8px; margin-top: 8px; background: var(--green-light); border-radius: 10px; padding: 7px 12px; }
-  .mic-tip-icon { font-size: 18px; flex-shrink: 0; }
-  .mic-tip-text { font-size: 12px; color: var(--green-dark); font-weight: 600; line-height: 1.4; }
+  .mic-status { font-size: 12px; color: var(--text-muted); margin-top: 6px; padding: 0 4px; min-height: 18px; transition: color 0.2s; }
+  .mic-status.listening { color: var(--red); font-weight: 700; }
+  .mic-status.success { color: var(--green-dark); font-weight: 700; }
 
   .filter-bar { display: flex; gap: 6px; padding: 10px 14px; background: var(--white); border-bottom: 1px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .filter-bar::-webkit-scrollbar { display: none; }
@@ -40,7 +46,7 @@
 
   .items-list { flex: 1; padding: 10px 14px 90px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   .list-item { background: var(--white); border-radius: 14px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); animation: slideIn 0.18s ease; }
-  @keyframes slideIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
   .list-item.bought { opacity: 0.45; }
 
   .checkbox { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-top: 1px; font-size: 14px; color: white; transition: all 0.15s; }
@@ -88,13 +94,11 @@
 
   <div class="input-area">
     <div class="input-row">
+      <button class="btn-mic" id="micBtn">🎤</button>
       <input class="product-input" id="productInput" placeholder="Wpisz lub powiedz produkt..." autocomplete="off" />
       <button class="btn-add" id="addBtn">+</button>
     </div>
-    <div class="mic-tip">
-      <span class="mic-tip-icon">🎤</span>
-      <span class="mic-tip-text">Głos: kliknij pole tekstowe → naciśnij 🎤 na klawiaturze → mów → zatwierdź +</span>
-    </div>
+    <div class="mic-status" id="micStatus">Naciśnij 🎤 aby dodać produkt głosem po polsku</div>
   </div>
 
   <div class="filter-bar">
@@ -127,21 +131,20 @@
     setTimeout(() => t.classList.remove('show'), 2200);
   }
 
-  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
 
   function render() {
     const total = items.length, bought = items.filter(i=>i.bought).length;
     document.getElementById('statTotal').textContent = total + ' produktów';
     document.getElementById('statBought').textContent = bought + ' kupionych';
-
-    const filtered = filter === 'pending' ? items.filter(i=>!i.bought) : filter === 'bought' ? items.filter(i=>i.bought) : items;
+    const filtered = filter==='pending' ? items.filter(i=>!i.bought) : filter==='bought' ? items.filter(i=>i.bought) : items;
     const list = document.getElementById('itemsList');
-
     if (!filtered.length) {
-      list.innerHTML = `<div class="empty-state"><div class="empty-icon">🛒</div><p>Lista jest pusta</p><small>Wpisz produkt lub użyj 🎤 na klawiaturze</small></div>`;
+      list.innerHTML = `<div class="empty-state"><div class="empty-icon">🛒</div><p>Lista jest pusta</p><small>Wpisz lub powiedz co kupić</small></div>`;
       return;
     }
-
     list.innerHTML = filtered.map(item => `
       <div class="list-item ${item.bought?'bought':''}">
         <div class="checkbox ${item.bought?'checked':''}" onclick="toggleBought(${item.id})">${item.bought?'✓':''}</div>
@@ -155,9 +158,8 @@
           <button class="btn-action btn-delete" onclick="deleteItem(${item.id})">✕</button>
         </div>
       </div>`).join('');
-
     filtered.forEach(item => {
-      if (item.showNote) { const f = document.getElementById('nf-'+item.id); if(f){f.focus();f.setSelectionRange(f.value.length,f.value.length);} }
+      if (item.showNote) { const f=document.getElementById('nf-'+item.id); if(f){f.focus();f.setSelectionRange(f.value.length,f.value.length);} }
     });
   }
 
@@ -169,17 +171,14 @@
   }
 
   function toggleBought(id) { const i=items.find(x=>x.id===id); if(i){i.bought=!i.bought;save();render();} }
-
   function toggleNote(id) {
     items.forEach(i=>{if(i.id!==id)i.showNote=false;});
     const i=items.find(x=>x.id===id); if(i){i.showNote=!i.showNote;render();}
   }
-
   function saveNote(id) {
     const i=items.find(x=>x.id===id), f=document.getElementById('nf-'+id);
     if(i&&f){i.note=f.value.trim();i.showNote=false;save();render();}
   }
-
   function deleteItem(id) { items=items.filter(i=>i.id!==id); save(); render(); }
 
   document.getElementById('addBtn').addEventListener('click', ()=>addItem(document.getElementById('productInput').value));
@@ -197,8 +196,73 @@
     if(!count){showToast('Brak kupionych produktów');return;}
     items=items.filter(i=>!i.bought); save(); render(); showToast('Usunięto '+count+' kupionych ✓');
   });
-
   document.getElementById('btnSave').addEventListener('click', ()=>{ save(); showToast('Lista zapisana! ✓'); });
+
+  // MIKROFON
+  const micBtn = document.getElementById('micBtn');
+  const micStatus = document.getElementById('micStatus');
+  let recognition = null;
+  let isRecording = false;
+
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.lang = 'pl-PL';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.continuous = false;
+
+    recognition.onstart = () => {
+      micStatus.textContent = '🔴 Słucham... mów teraz';
+      micStatus.className = 'mic-status listening';
+    };
+
+    recognition.onresult = e => {
+      const text = e.results[0][0].transcript;
+      document.getElementById('productInput').value = text;
+      micStatus.textContent = '✓ Rozpoznano: "' + text + '" — naciśnij + aby dodać';
+      micStatus.className = 'mic-status success';
+      stopRec();
+    };
+
+    recognition.onerror = e => {
+      if (e.error === 'not-allowed') {
+        micStatus.textContent = '⚠ Brak zgody na mikrofon — zezwól w przeglądarce';
+      } else if (e.error === 'no-speech') {
+        micStatus.textContent = 'Nie wykryto mowy, spróbuj ponownie';
+      } else {
+        micStatus.textContent = 'Błąd: ' + e.error;
+      }
+      micStatus.className = 'mic-status';
+      stopRec();
+    };
+
+    recognition.onend = () => stopRec();
+
+  } else {
+    micBtn.style.opacity = '0.4';
+    micBtn.title = 'Niedostępne w tej przeglądarce';
+    micStatus.textContent = '⚠ Mikrofon niedostępny — użyj Chrome lub Samsung Internet';
+  }
+
+  function startRec() {
+    if (!recognition) return;
+    isRecording = true;
+    micBtn.classList.add('recording');
+    micBtn.textContent = '⏹';
+    try { recognition.start(); } catch(e) {}
+  }
+
+  function stopRec() {
+    isRecording = false;
+    micBtn.classList.remove('recording');
+    micBtn.textContent = '🎤';
+  }
+
+  micBtn.addEventListener('click', () => {
+    if (isRecording) { try { recognition.stop(); } catch(e) {} stopRec(); }
+    else startRec();
+  });
 
   render();
 </script>

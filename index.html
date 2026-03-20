@@ -14,7 +14,7 @@
     --red: #e74c3c; --border: #e5e7eb; --bg: #f4f6f5;
     --white: #ffffff; --text: #1a1a1a; --text-muted: #6b7280;
   }
-  html, body { height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); -webkit-tap-highlight-color: transparent; user-select: none; }
   .app { max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
 
   .header { background: var(--green); padding: 20px 18px 22px; position: sticky; top: 0; z-index: 10; }
@@ -24,7 +24,7 @@
 
   .input-area { background: var(--white); padding: 12px 14px 10px; border-bottom: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
   .input-row { display: flex; gap: 8px; align-items: center; }
-  .product-input { flex: 1; border: 1.5px solid var(--border); border-radius: 24px; padding: 11px 16px; font-size: 15px; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s; }
+  .product-input { flex: 1; border: 1.5px solid var(--border); border-radius: 24px; padding: 11px 16px; font-size: 15px; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s; user-select: text; }
   .product-input:focus { border-color: var(--green); background: white; }
 
   .btn-mic { width: 44px; height: 44px; border-radius: 50%; background: var(--bg); border: 1.5px solid var(--border); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
@@ -43,30 +43,32 @@
   .filter-chip { border: 1.5px solid var(--border); border-radius: 20px; padding: 5px 14px; font-size: 13px; cursor: pointer; white-space: nowrap; background: var(--white); color: var(--text-muted); font-family: 'Nunito', sans-serif; font-weight: 600; transition: all 0.15s; }
   .filter-chip.active { background: var(--green); border-color: var(--green); color: white; }
 
-  .items-list { flex: 1; padding: 10px 14px 90px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .items-list { flex: 1; padding: 10px 14px 90px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; }
 
-  .list-item { background: var(--white); border-radius: 14px; padding: 10px 10px 10px 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .list-item { background: var(--white); border-radius: 14px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); transition: box-shadow 0.15s, opacity 0.15s; position: relative; }
+  .list-item.dragging { opacity: 0.4; }
+  .list-item.drag-over { box-shadow: 0 0 0 2px var(--green), 0 4px 12px rgba(45,122,79,0.2); }
   .list-item.bought { opacity: 0.45; }
+  .list-item.bought.dragging { opacity: 0.2; }
 
-  .move-btns { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
-  .btn-move { width: 28px; height: 28px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text-muted); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.12s; padding: 0; line-height: 1; }
-  .btn-move:active { background: var(--green-light); border-color: var(--green); color: var(--green-dark); transform: scale(0.92); }
-  .btn-move:disabled { opacity: 0.2; pointer-events: none; }
+  .drag-handle { display: flex; flex-direction: column; gap: 3px; padding: 4px 2px; cursor: grab; flex-shrink: 0; margin-top: 3px; touch-action: none; }
+  .drag-handle span { display: block; width: 16px; height: 2px; background: #d1d5db; border-radius: 2px; }
+  .drag-handle:active { cursor: grabbing; }
 
-  .checkbox { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; transition: all 0.15s; }
+  .checkbox { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-top: 1px; font-size: 14px; color: white; transition: all 0.15s; }
   .checkbox.checked { background: var(--green); border-color: var(--green); }
 
   .item-body { flex: 1; min-width: 0; }
-  .item-name { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.3; }
+  .item-name { font-size: 16px; font-weight: 600; color: var(--text); line-height: 1.3; }
   .bought .item-name { text-decoration: line-through; color: var(--text-muted); }
-  .item-note { font-size: 12px; color: var(--green-dark); background: var(--green-light); display: inline-block; margin-top: 3px; padding: 2px 8px; border-radius: 8px; font-weight: 600; }
+  .item-note { font-size: 12px; color: var(--green-dark); background: var(--green-light); display: inline-block; margin-top: 4px; padding: 2px 8px; border-radius: 8px; font-weight: 600; }
 
-  .note-input-row { margin-top: 6px; display: flex; gap: 6px; }
-  .note-field { flex: 1; border: 1.5px solid var(--green); border-radius: 10px; padding: 6px 10px; font-size: 13px; font-family: 'Nunito', sans-serif; background: var(--white); color: var(--text); outline: none; }
+  .note-input-row { margin-top: 8px; display: flex; gap: 6px; }
+  .note-field { flex: 1; border: 1.5px solid var(--green); border-radius: 10px; padding: 6px 10px; font-size: 13px; font-family: 'Nunito', sans-serif; background: var(--white); color: var(--text); outline: none; user-select: text; }
   .btn-save-note { border: none; background: var(--green); color: white; border-radius: 10px; padding: 6px 12px; font-size: 13px; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; }
 
-  .item-actions { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
-  .btn-action { width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; background: transparent; }
+  .item-actions { display: flex; gap: 2px; align-items: flex-start; }
+  .btn-action { width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; background: transparent; }
   .btn-action:active { transform: scale(0.88); }
   .btn-delete { color: #c0392b; }
   .btn-note { color: var(--green); }
@@ -139,18 +141,12 @@
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  function getFiltered() {
-    if (filter === 'pending') return items.filter(i => !i.bought);
-    if (filter === 'bought')  return items.filter(i => i.bought);
-    return items;
-  }
-
   function render() {
-    const total = items.length, bought = items.filter(i => i.bought).length;
+    const total = items.length, bought = items.filter(i=>i.bought).length;
     document.getElementById('statTotal').textContent = total + ' produktów';
     document.getElementById('statBought').textContent = bought + ' kupionych';
 
-    const filtered = getFiltered();
+    const filtered = filter==='pending' ? items.filter(i=>!i.bought) : filter==='bought' ? items.filter(i=>i.bought) : items;
     const list = document.getElementById('itemsList');
 
     if (!filtered.length) {
@@ -158,13 +154,12 @@
       return;
     }
 
-    list.innerHTML = filtered.map((item, idx) => `
-      <div class="list-item ${item.bought ? 'bought' : ''}" data-id="${item.id}">
-        <div class="move-btns">
-          <button class="btn-move" onclick="moveItem(${item.id},-1)" ${idx === 0 ? 'disabled' : ''}>▲</button>
-          <button class="btn-move" onclick="moveItem(${item.id},1)" ${idx === filtered.length - 1 ? 'disabled' : ''}>▼</button>
+    list.innerHTML = filtered.map(item => `
+      <div class="list-item ${item.bought?'bought':''}" data-id="${item.id}">
+        <div class="drag-handle" data-drag="${item.id}">
+          <span></span><span></span><span></span>
         </div>
-        <div class="checkbox ${item.bought ? 'checked' : ''}" onclick="toggleBought(${item.id})">${item.bought ? '✓' : ''}</div>
+        <div class="checkbox ${item.bought?'checked':''}" onclick="toggleBought(${item.id})">${item.bought?'✓':''}</div>
         <div class="item-body">
           <div class="item-name">${esc(item.name)}</div>
           ${item.note ? `<div class="item-note">📝 ${esc(item.note)}</div>` : ''}
@@ -178,69 +173,99 @@
 
     filtered.forEach(item => {
       if (item.showNote) {
-        const f = document.getElementById('nf-' + item.id);
-        if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); }
+        const f = document.getElementById('nf-'+item.id);
+        if(f){f.focus();f.setSelectionRange(f.value.length,f.value.length);}
       }
     });
-  }
 
-  function moveItem(id, dir) {
-    const filtered = getFiltered();
-    const filteredIdx = filtered.findIndex(i => i.id === id);
-    const targetIdx = filteredIdx + dir;
-    if (targetIdx < 0 || targetIdx >= filtered.length) return;
-
-    const realFrom = items.findIndex(i => i.id === filtered[filteredIdx].id);
-    const realTo   = items.findIndex(i => i.id === filtered[targetIdx].id);
-    if (realFrom === -1 || realTo === -1) return;
-
-    const [moved] = items.splice(realFrom, 1);
-    items.splice(realTo, 0, moved);
-    save(); render();
+    initDrag();
   }
 
   function addItem(name) {
     name = name.trim(); if (!name) return;
-    items.unshift({ id: nextId++, name, note: '', bought: false, showNote: false });
+    items.unshift({id:nextId++, name, note:'', bought:false, showNote:false});
     document.getElementById('productInput').value = '';
     save(); render();
   }
 
-  function toggleBought(id) {
-    const i = items.find(x => x.id === id);
-    if (i) { i.bought = !i.bought; save(); render(); }
-  }
+  function toggleBought(id) { const i=items.find(x=>x.id===id); if(i){i.bought=!i.bought;save();render();} }
 
   function toggleNote(id) {
-    items.forEach(i => { if (i.id !== id) i.showNote = false; });
-    const i = items.find(x => x.id === id);
-    if (i) { i.showNote = !i.showNote; render(); }
+    items.forEach(i=>{if(i.id!==id)i.showNote=false;});
+    const i=items.find(x=>x.id===id); if(i){i.showNote=!i.showNote;render();}
   }
 
   function saveNote(id) {
-    const i = items.find(x => x.id === id), f = document.getElementById('nf-' + id);
-    if (i && f) { i.note = f.value.trim(); i.showNote = false; save(); render(); }
+    const i=items.find(x=>x.id===id), f=document.getElementById('nf-'+id);
+    if(i&&f){i.note=f.value.trim();i.showNote=false;save();render();}
   }
 
-  function deleteItem(id) { items = items.filter(i => i.id !== id); save(); render(); }
+  function deleteItem(id) { items=items.filter(i=>i.id!==id); save(); render(); }
 
-  document.getElementById('addBtn').addEventListener('click', () => addItem(document.getElementById('productInput').value));
-  document.getElementById('productInput').addEventListener('keydown', e => { if (e.key === 'Enter') addItem(e.target.value); });
+  // DRAG & DROP (touch)
+  function initDrag() {
+    const list = document.getElementById('itemsList');
+    let dragId = null, dragEl = null, startY = 0, currentOver = null;
 
-  document.querySelectorAll('.filter-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active'); filter = chip.dataset.filter; render();
+    list.querySelectorAll('[data-drag]').forEach(handle => {
+      handle.addEventListener('touchstart', e => {
+        dragId = parseInt(handle.dataset.drag);
+        dragEl = handle.closest('.list-item');
+        startY = e.touches[0].clientY;
+        dragEl.classList.add('dragging');
+        e.preventDefault();
+      }, {passive: false});
+    });
+
+    list.addEventListener('touchmove', e => {
+      if (!dragEl) return;
+      e.preventDefault();
+      const y = e.touches[0].clientY;
+      const els = [...list.querySelectorAll('.list-item:not(.dragging)')];
+      let over = null;
+      for (const el of els) {
+        const rect = el.getBoundingClientRect();
+        if (y >= rect.top && y <= rect.bottom) { over = el; break; }
+      }
+      if (currentOver && currentOver !== over) currentOver.classList.remove('drag-over');
+      if (over) { over.classList.add('drag-over'); currentOver = over; }
+    }, {passive: false});
+
+    list.addEventListener('touchend', e => {
+      if (!dragEl) return;
+      dragEl.classList.remove('dragging');
+      if (currentOver) {
+        currentOver.classList.remove('drag-over');
+        const toId = parseInt(currentOver.dataset.id);
+        const fromIdx = items.findIndex(i=>i.id===dragId);
+        const toIdx = items.findIndex(i=>i.id===toId);
+        if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
+          const [moved] = items.splice(fromIdx, 1);
+          items.splice(toIdx, 0, moved);
+          save(); render();
+        }
+      }
+      dragEl = null; dragId = null; currentOver = null;
+    });
+  }
+
+  document.getElementById('addBtn').addEventListener('click', ()=>addItem(document.getElementById('productInput').value));
+  document.getElementById('productInput').addEventListener('keydown', e=>{ if(e.key==='Enter') addItem(e.target.value); });
+
+  document.querySelectorAll('.filter-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active'); filter=chip.dataset.filter; render();
     });
   });
 
-  document.getElementById('btnClear').addEventListener('click', () => {
-    const count = items.filter(i => i.bought).length;
-    if (!count) { showToast('Brak kupionych produktów'); return; }
-    items = items.filter(i => !i.bought); save(); render(); showToast('Usunięto ' + count + ' kupionych ✓');
+  document.getElementById('btnClear').addEventListener('click', ()=>{
+    const count=items.filter(i=>i.bought).length;
+    if(!count){showToast('Brak kupionych produktów');return;}
+    items=items.filter(i=>!i.bought); save(); render(); showToast('Usunięto '+count+' kupionych ✓');
   });
 
-  document.getElementById('btnSave').addEventListener('click', () => { save(); showToast('Lista zapisana! ✓'); });
+  document.getElementById('btnSave').addEventListener('click', ()=>{ save(); showToast('Lista zapisana! ✓'); });
 
   // MIKROFON
   const micBtn = document.getElementById('micBtn');
@@ -267,8 +292,8 @@
       stopRec();
     };
     recognition.onerror = e => {
-      if (e.error === 'not-allowed') micStatus.textContent = '⚠ Brak zgody na mikrofon';
-      else if (e.error === 'no-speech') micStatus.textContent = 'Nie wykryto mowy, spróbuj ponownie';
+      if (e.error==='not-allowed') micStatus.textContent = '⚠ Brak zgody na mikrofon';
+      else if (e.error==='no-speech') micStatus.textContent = 'Nie wykryto mowy, spróbuj ponownie';
       else micStatus.textContent = 'Błąd: ' + e.error;
       micStatus.className = 'mic-status';
       stopRec();

@@ -24,7 +24,6 @@
 
   .input-area { background: var(--white); padding: 12px 14px 10px; border-bottom: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
   .input-row { display: flex; gap: 8px; align-items: center; }
-
   .product-input { flex: 1; border: 1.5px solid var(--border); border-radius: 24px; padding: 11px 16px; font-size: 15px; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s; }
   .product-input:focus { border-color: var(--green); background: white; }
 
@@ -35,7 +34,7 @@
   .btn-add { width: 44px; height: 44px; border-radius: 50%; background: var(--green); border: none; color: white; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.1s; }
   .btn-add:active { transform: scale(0.92); }
 
-  .mic-status { font-size: 12px; color: var(--text-muted); margin-top: 6px; padding: 0 4px; min-height: 18px; transition: color 0.2s; }
+  .mic-status { font-size: 12px; color: var(--text-muted); margin-top: 6px; padding: 0 4px; min-height: 18px; }
   .mic-status.listening { color: var(--red); font-weight: 700; }
   .mic-status.success { color: var(--green-dark); font-weight: 700; }
 
@@ -45,24 +44,29 @@
   .filter-chip.active { background: var(--green); border-color: var(--green); color: white; }
 
   .items-list { flex: 1; padding: 10px 14px 90px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-  .list-item { background: var(--white); border-radius: 14px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); animation: slideIn 0.18s ease; }
-  @keyframes slideIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
+
+  .list-item { background: var(--white); border-radius: 14px; padding: 10px 10px 10px 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
   .list-item.bought { opacity: 0.45; }
 
-  .checkbox { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-top: 1px; font-size: 14px; color: white; transition: all 0.15s; }
+  .move-btns { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+  .btn-move { width: 28px; height: 28px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text-muted); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.12s; padding: 0; line-height: 1; }
+  .btn-move:active { background: var(--green-light); border-color: var(--green); color: var(--green-dark); transform: scale(0.92); }
+  .btn-move:disabled { opacity: 0.2; pointer-events: none; }
+
+  .checkbox { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; transition: all 0.15s; }
   .checkbox.checked { background: var(--green); border-color: var(--green); }
 
   .item-body { flex: 1; min-width: 0; }
-  .item-name { font-size: 16px; font-weight: 600; color: var(--text); line-height: 1.3; }
+  .item-name { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.3; }
   .bought .item-name { text-decoration: line-through; color: var(--text-muted); }
-  .item-note { font-size: 12px; color: var(--green-dark); background: var(--green-light); display: inline-block; margin-top: 4px; padding: 2px 8px; border-radius: 8px; font-weight: 600; }
+  .item-note { font-size: 12px; color: var(--green-dark); background: var(--green-light); display: inline-block; margin-top: 3px; padding: 2px 8px; border-radius: 8px; font-weight: 600; }
 
-  .note-input-row { margin-top: 8px; display: flex; gap: 6px; }
+  .note-input-row { margin-top: 6px; display: flex; gap: 6px; }
   .note-field { flex: 1; border: 1.5px solid var(--green); border-radius: 10px; padding: 6px 10px; font-size: 13px; font-family: 'Nunito', sans-serif; background: var(--white); color: var(--text); outline: none; }
   .btn-save-note { border: none; background: var(--green); color: white; border-radius: 10px; padding: 6px 12px; font-size: 13px; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; }
 
-  .item-actions { display: flex; gap: 2px; align-items: flex-start; }
-  .btn-action { width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; background: transparent; }
+  .item-actions { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+  .btn-action { width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; background: transparent; }
   .btn-action:active { transform: scale(0.88); }
   .btn-delete { color: #c0392b; }
   .btn-note { color: var(--green); }
@@ -135,19 +139,32 @@
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  function getFiltered() {
+    if (filter === 'pending') return items.filter(i => !i.bought);
+    if (filter === 'bought')  return items.filter(i => i.bought);
+    return items;
+  }
+
   function render() {
-    const total = items.length, bought = items.filter(i=>i.bought).length;
+    const total = items.length, bought = items.filter(i => i.bought).length;
     document.getElementById('statTotal').textContent = total + ' produktów';
     document.getElementById('statBought').textContent = bought + ' kupionych';
-    const filtered = filter==='pending' ? items.filter(i=>!i.bought) : filter==='bought' ? items.filter(i=>i.bought) : items;
+
+    const filtered = getFiltered();
     const list = document.getElementById('itemsList');
+
     if (!filtered.length) {
       list.innerHTML = `<div class="empty-state"><div class="empty-icon">🛒</div><p>Lista jest pusta</p><small>Wpisz lub powiedz co kupić</small></div>`;
       return;
     }
-    list.innerHTML = filtered.map(item => `
-      <div class="list-item ${item.bought?'bought':''}">
-        <div class="checkbox ${item.bought?'checked':''}" onclick="toggleBought(${item.id})">${item.bought?'✓':''}</div>
+
+    list.innerHTML = filtered.map((item, idx) => `
+      <div class="list-item ${item.bought ? 'bought' : ''}" data-id="${item.id}">
+        <div class="move-btns">
+          <button class="btn-move" onclick="moveItem(${item.id},-1)" ${idx === 0 ? 'disabled' : ''}>▲</button>
+          <button class="btn-move" onclick="moveItem(${item.id},1)" ${idx === filtered.length - 1 ? 'disabled' : ''}>▼</button>
+        </div>
+        <div class="checkbox ${item.bought ? 'checked' : ''}" onclick="toggleBought(${item.id})">${item.bought ? '✓' : ''}</div>
         <div class="item-body">
           <div class="item-name">${esc(item.name)}</div>
           ${item.note ? `<div class="item-note">📝 ${esc(item.note)}</div>` : ''}
@@ -158,51 +175,77 @@
           <button class="btn-action btn-delete" onclick="deleteItem(${item.id})">✕</button>
         </div>
       </div>`).join('');
+
     filtered.forEach(item => {
-      if (item.showNote) { const f=document.getElementById('nf-'+item.id); if(f){f.focus();f.setSelectionRange(f.value.length,f.value.length);} }
+      if (item.showNote) {
+        const f = document.getElementById('nf-' + item.id);
+        if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); }
+      }
     });
+  }
+
+  function moveItem(id, dir) {
+    const filtered = getFiltered();
+    const filteredIdx = filtered.findIndex(i => i.id === id);
+    const targetIdx = filteredIdx + dir;
+    if (targetIdx < 0 || targetIdx >= filtered.length) return;
+
+    const realFrom = items.findIndex(i => i.id === filtered[filteredIdx].id);
+    const realTo   = items.findIndex(i => i.id === filtered[targetIdx].id);
+    if (realFrom === -1 || realTo === -1) return;
+
+    const [moved] = items.splice(realFrom, 1);
+    items.splice(realTo, 0, moved);
+    save(); render();
   }
 
   function addItem(name) {
     name = name.trim(); if (!name) return;
-    items.unshift({id:nextId++, name, note:'', bought:false, showNote:false});
+    items.unshift({ id: nextId++, name, note: '', bought: false, showNote: false });
     document.getElementById('productInput').value = '';
     save(); render();
   }
 
-  function toggleBought(id) { const i=items.find(x=>x.id===id); if(i){i.bought=!i.bought;save();render();} }
+  function toggleBought(id) {
+    const i = items.find(x => x.id === id);
+    if (i) { i.bought = !i.bought; save(); render(); }
+  }
+
   function toggleNote(id) {
-    items.forEach(i=>{if(i.id!==id)i.showNote=false;});
-    const i=items.find(x=>x.id===id); if(i){i.showNote=!i.showNote;render();}
+    items.forEach(i => { if (i.id !== id) i.showNote = false; });
+    const i = items.find(x => x.id === id);
+    if (i) { i.showNote = !i.showNote; render(); }
   }
+
   function saveNote(id) {
-    const i=items.find(x=>x.id===id), f=document.getElementById('nf-'+id);
-    if(i&&f){i.note=f.value.trim();i.showNote=false;save();render();}
+    const i = items.find(x => x.id === id), f = document.getElementById('nf-' + id);
+    if (i && f) { i.note = f.value.trim(); i.showNote = false; save(); render(); }
   }
-  function deleteItem(id) { items=items.filter(i=>i.id!==id); save(); render(); }
 
-  document.getElementById('addBtn').addEventListener('click', ()=>addItem(document.getElementById('productInput').value));
-  document.getElementById('productInput').addEventListener('keydown', e=>{ if(e.key==='Enter') addItem(e.target.value); });
+  function deleteItem(id) { items = items.filter(i => i.id !== id); save(); render(); }
 
-  document.querySelectorAll('.filter-chip').forEach(chip=>{
-    chip.addEventListener('click', ()=>{
-      document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
-      chip.classList.add('active'); filter=chip.dataset.filter; render();
+  document.getElementById('addBtn').addEventListener('click', () => addItem(document.getElementById('productInput').value));
+  document.getElementById('productInput').addEventListener('keydown', e => { if (e.key === 'Enter') addItem(e.target.value); });
+
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active'); filter = chip.dataset.filter; render();
     });
   });
 
-  document.getElementById('btnClear').addEventListener('click', ()=>{
-    const count=items.filter(i=>i.bought).length;
-    if(!count){showToast('Brak kupionych produktów');return;}
-    items=items.filter(i=>!i.bought); save(); render(); showToast('Usunięto '+count+' kupionych ✓');
+  document.getElementById('btnClear').addEventListener('click', () => {
+    const count = items.filter(i => i.bought).length;
+    if (!count) { showToast('Brak kupionych produktów'); return; }
+    items = items.filter(i => !i.bought); save(); render(); showToast('Usunięto ' + count + ' kupionych ✓');
   });
-  document.getElementById('btnSave').addEventListener('click', ()=>{ save(); showToast('Lista zapisana! ✓'); });
+
+  document.getElementById('btnSave').addEventListener('click', () => { save(); showToast('Lista zapisana! ✓'); });
 
   // MIKROFON
   const micBtn = document.getElementById('micBtn');
   const micStatus = document.getElementById('micStatus');
-  let recognition = null;
-  let isRecording = false;
+  let recognition = null, isRecording = false;
 
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -216,7 +259,6 @@
       micStatus.textContent = '🔴 Słucham... mów teraz';
       micStatus.className = 'mic-status listening';
     };
-
     recognition.onresult = e => {
       const text = e.results[0][0].transcript;
       document.getElementById('productInput').value = text;
@@ -224,25 +266,17 @@
       micStatus.className = 'mic-status success';
       stopRec();
     };
-
     recognition.onerror = e => {
-      if (e.error === 'not-allowed') {
-        micStatus.textContent = '⚠ Brak zgody na mikrofon — zezwól w przeglądarce';
-      } else if (e.error === 'no-speech') {
-        micStatus.textContent = 'Nie wykryto mowy, spróbuj ponownie';
-      } else {
-        micStatus.textContent = 'Błąd: ' + e.error;
-      }
+      if (e.error === 'not-allowed') micStatus.textContent = '⚠ Brak zgody na mikrofon';
+      else if (e.error === 'no-speech') micStatus.textContent = 'Nie wykryto mowy, spróbuj ponownie';
+      else micStatus.textContent = 'Błąd: ' + e.error;
       micStatus.className = 'mic-status';
       stopRec();
     };
-
     recognition.onend = () => stopRec();
-
   } else {
     micBtn.style.opacity = '0.4';
-    micBtn.title = 'Niedostępne w tej przeglądarce';
-    micStatus.textContent = '⚠ Mikrofon niedostępny — użyj Chrome lub Samsung Internet';
+    micStatus.textContent = '⚠ Mikrofon niedostępny — użyj Chrome';
   }
 
   function startRec() {
